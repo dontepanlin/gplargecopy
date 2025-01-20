@@ -42,7 +42,6 @@ var counter int32
 
 var pool *pgxpool.Pool
 var stats sync.Map
-var tableLock map[string]*sync.Mutex
 
 func main() {
 	args := parseArgs()
@@ -68,16 +67,9 @@ func main() {
 	<-done
 	fmt.Println("Waiting parallel cursors created...")
 	time.Sleep(time.Duration(5) * time.Second)
-
-	endpointMap := make(map[string]*Endpoint, 0)
-	endpointMapDst := make(map[string]string, 0)
-	tableLock = make(map[string]*sync.Mutex, 0)
-
+	fmt.Println("Started retrieve...")
 	for dst_table, endpoints := range getEndpoints(ctx, args) {
-		tableLock[dst_table] = &sync.Mutex{}
 		for _, endpoint := range endpoints {
-			endpointMap[endpoint.endpoint] = endpoint
-			endpointMapDst[endpoint.endpoint] = dst_table
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
