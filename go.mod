@@ -1,4 +1,4 @@
-module large_copy
+module gplargecopy
 
 go 1.23.4
 
